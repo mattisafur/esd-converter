@@ -1,5 +1,6 @@
 import tkinter as tk
 import tkinter.filedialog as fd
+from tkinter import messagebox
 
 import dism_operations
 
@@ -35,18 +36,23 @@ class EsdConverter(tk.Frame):
         # prompt to select the file location and name to export the images to
         file_types = [("WIM file", "*.wim")]
 
+        # get source path from entry
+        source_path: str = self.esd_file_path_entry.get()
+        if source_path == "":
+            messagebox.showerror(
+                title="Error", message="Please enter the path to the ESD file."
+            )
+            raise FileNotFoundError
+
         destination_path: str = fd.asksaveasfilename(
             title="Export as", initialfile="install.wim", filetypes=file_types
         )
-
-        # get source path from entry
-        source_path: str = self.esd_file_path_entry.get()
 
         # get and parse images from dism
         try:
             dism_output: str = dism_operations.dism_get_wiminfo(source_path)
         except FileNotFoundError:
-            # TODO raise message to user saying the file does not exist
+            self.raise_file_not_found_error()
             raise FileNotFoundError
         images: list[dict[str, str]] = dism_operations.parse_dism_get_wiminfo_output(
             dism_output
@@ -58,8 +64,14 @@ class EsdConverter(tk.Frame):
                     source_path, image["Index"], destination_path
                 )
             except FileNotFoundError:
-                # TODO raise message to user sayg the file does not exist
+                self.raise_file_not_found_error()
                 raise FileNotFoundError
+
+    def raise_file_not_found_error(self) -> None:
+        messagebox.showerror(
+            title="Error",
+            message="The file entered does not exist.",
+        )
 
 
 if __name__ == "__main__":
