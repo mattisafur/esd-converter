@@ -35,8 +35,6 @@ def dism_export_image(
 
 
 def parse_dism_get_wiminfo_output(dism_get_wiminfo_output: str) -> list[dict[str, str]]:
-    print(list(dism_get_wiminfo_output))  # TODO remove line
-
     # strip start and end of output, leaving only the image information
     start_phrase: str = "Index : 1"
     end_phrase: str = "bytes"
@@ -47,12 +45,8 @@ def parse_dism_get_wiminfo_output(dism_get_wiminfo_output: str) -> list[dict[str
     index = trimmed_output.rfind(end_phrase) + len(end_phrase)
     trimmed_output = trimmed_output[:index]
 
-    print(list(trimmed_output))  # TODO Remove line
-
     # split string to images
     images: list[str] = trimmed_output.split("\r\n\r\n")
-
-    print(images)  # TODO remove line
 
     # parse each image to a dictionary and append it to a list
     parsed_output: list[dict[str, str]] = []
